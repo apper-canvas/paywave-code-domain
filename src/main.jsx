@@ -7,5 +7,12 @@ import { BrowserRouter } from 'react-router-dom'
 ReactDOM.createRoot(document.getElementById('root')).render(
   <BrowserRouter>
     <App />
-  </BrowserRouter>,
+  </BrowserRouter>
 )
+
+// Enable HMR with full reload as fallback
+if (import.meta.hot) {
+  import.meta.hot.accept('./App.jsx', (newModule) => {
+    if (newModule === undefined) location.reload();
+  });
+}
