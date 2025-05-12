@@ -7,6 +7,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setUser, clearUser } from './store/userSlice';
 import getIcon from './utils/iconUtils';
 import axios from 'axios';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+
+// Initialize dayjs plugins
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 // Components
 import ProtectedRoute from './components/ProtectedRoute';
@@ -31,6 +38,10 @@ function App() {
   const [todoData, setTodoData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [currentTime, setCurrentTime] = useState({
+    utc: dayjs().utc().format('YYYY-MM-DD HH:mm:ss'),
+    local: dayjs().format('YYYY-MM-DD HH:mm:ss')
+  });
   const [isDarkMode, setIsDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
       return localStorage.getItem('theme') === 'dark' || 
@@ -43,6 +54,19 @@ function App() {
   const userState = useSelector((state) => state.user);
   const isAuthenticated = userState?.isAuthenticated || false;
   
+  // Update time every second
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime({
+        utc: dayjs().utc().format('YYYY-MM-DD HH:mm:ss'),
+        local: dayjs().format('YYYY-MM-DD HH:mm:ss')
+      });
+    }, 1000);
+    
+    // Cleanup interval on component unmount
+    return () => clearInterval(timer);
+  }, []);
+
   useEffect(() => {
     if (isDarkMode) {
       document.documentElement.classList.add('dark');
@@ -133,6 +157,23 @@ function App() {
         />
         
         <main className="container mx-auto px-4 py-6 md:px-6 md:py-8 flex-grow">
+          {/* Display current time with dayjs */}
+          <div className="mb-6 p-4 bg-white dark:bg-surface-800 rounded-xl shadow-card">
+            <h2 className="text-xl font-semibold mb-3">Current Time:</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="p-3 bg-surface-100 dark:bg-surface-700 rounded-lg">
+                <p className="text-sm text-surface-600 dark:text-surface-400 mb-1">UTC Time:</p>
+                <p className="text-xl font-mono">{currentTime.utc}</p>
+              </div>
+              <div className="p-3 bg-surface-100 dark:bg-surface-700 rounded-lg">
+                <p className="text-sm text-surface-600 dark:text-surface-400 mb-1">
+                  Local Time ({dayjs.tz.guess()}):
+                </p>
+                <p className="text-xl font-mono">{currentTime.local}</p>
+              </div>
+            </div>
+          </div>
+          
           {/* Display fetched todo data */}
           <div className="mb-6 p-4 bg-white dark:bg-surface-800 rounded-xl shadow-card">
             <h2 className="text-xl font-semibold mb-3">Todo from JSONPlaceholder:</h2>
