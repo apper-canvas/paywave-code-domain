@@ -8,6 +8,8 @@ const MainFeature = ({ activeTab }) => {
   const SendIcon = getIcon('SendHorizonal');
   const UserIcon = getIcon('User');
   const PhoneIcon = getIcon('Phone');
+  const DownloadIcon = getIcon('Download');
+  const CheckIcon = getIcon('Check');
   const DollarIcon = getIcon('DollarSign');
   const SearchIcon = getIcon('Search');
   const QrCodeIcon = getIcon('QrCode');
@@ -160,7 +162,7 @@ const MainFeature = ({ activeTab }) => {
                             />
                             {recipient === contact.id.toString() && (
                               <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
-                                {getIcon('Check')({ className: "w-8 h-8 text-white" })}
+                                <CheckIcon className="w-8 h-8 text-white" />
                               </div>
                             )}
                           </div>
@@ -318,7 +320,7 @@ const MainFeature = ({ activeTab }) => {
             className="card"
           >
             <h3 className="text-xl font-bold mb-6 flex items-center">
-              {getIcon('Download')({ className: "w-5 h-5 mr-2 text-primary" })}
+              <DownloadIcon className="w-5 h-5 mr-2 text-primary" />
               Request Money
             </h3>
             
@@ -492,7 +494,7 @@ const MainFeature = ({ activeTab }) => {
                 className="flex items-center justify-between w-full p-4 text-primary bg-primary/5 rounded-xl"
               >
                 <div className="flex items-center">
-                  {getIcon('CreditCard')({ className: "w-5 h-5 mr-3" })}
+                  <CreditCardIcon className="w-5 h-5 mr-3" />
                   <span>Get a virtual card</span>
                 </div>
                 <ChevronRightIcon className="w-5 h-5" />
