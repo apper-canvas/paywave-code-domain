@@ -1,15 +1,32 @@
-import { useState, useEffect } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { useState, useEffect, createContext } from 'react';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
+import { useDispatch, useSelector } from 'react-redux';
+import { setUser, clearUser } from './store/userSlice';
 import getIcon from './utils/iconUtils';
+
+// Components
+import ProtectedRoute from './components/ProtectedRoute';
+import PublicRoute from './components/PublicRoute';
+import Header from './components/Header';
+import Footer from './components/Footer';
 
 // Pages
 import Home from './pages/Home';
+import Dashboard from './pages/Dashboard';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
 import NotFound from './pages/NotFound';
 
+// Create auth context
+export const AuthContext = createContext(null);
+
 function App() {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [isInitialized, setIsInitialized] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
       return localStorage.getItem('theme') === 'dark' || 
@@ -17,7 +34,11 @@ function App() {
     }
     return false;
   });
-
+  
+  // Get authentication status with proper error handling
+  const userState = useSelector((state) => state.user);
+  const isAuthenticated = userState?.isAuthenticated || false;
+  
   useEffect(() => {
     if (isDarkMode) {
       document.documentElement.classList.add('dark');
@@ -31,72 +52,100 @@ function App() {
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
   };
-
-  const Moon = getIcon('Moon');
-  const Sun = getIcon('Sun');
-  const Wallet = getIcon('Wallet');
+  
+  // Initialize ApperUI once when the app loads
+  useEffect(() => {
+    const { ApperClient, ApperUI } = window.ApperSDK;
+    const client = new ApperClient({
+      apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+      apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+    });
+    
+    // Initialize but don't show login yet
+    ApperUI.setup(client, {
+      target: '#authentication',
+      clientId: import.meta.env.VITE_APPER_PROJECT_ID,
+      view: 'both',
+      onSuccess: function(user) {
+        // Store user data in Redux store
+        if (user && user.isAuthenticated) {
+          dispatch(setUser(user));
+          navigate('/dashboard');
+        }
+      },
+      onError: function(error) {
+        console.error("Authentication failed:", error);
+        toast.error("Authentication failed. Please try again.");
+      }
+    });
+    
+    setIsInitialized(true);
+  }, [dispatch, navigate]);
+  
+  // Authentication methods to share via context
+  const authMethods = {
+    isInitialized,
+    logout: async () => {
+      try {
+        const { ApperUI } = window.ApperSDK;
+        await ApperUI.logout();
+        dispatch(clearUser());
+        navigate('/login');
+        toast.success("You have been logged out successfully");
+      } catch (error) {
+        console.error("Logout failed:", error);
+        toast.error("Logout failed. Please try again.");
+      }
+    }
+  };
 
   return (
-    <div className="min-h-screen font-sans">
-      <header className="py-4 px-4 md:px-6 bg-white dark:bg-surface-800 shadow-soft">
-        <div className="container mx-auto">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-primary via-primary-light to-accent flex items-center justify-center">
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: "spring", stiffness: 260, damping: 20 }}
-                >
-                  <Wallet className="w-4 h-4 text-white" />
-                </motion.div>
-              </div>
-              <h1 className="text-xl font-bold bg-gradient-to-r from-primary via-primary-light to-accent bg-clip-text text-transparent">
-                PayWave
-              </h1>
-            </div>
-            <button 
-              onClick={toggleDarkMode} 
-              className="p-2 rounded-full hover:bg-surface-100 dark:hover:bg-surface-700 transition-colors"
-              aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
-            >
-              {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <main className="container mx-auto px-4 py-6 md:px-6 md:py-8">
-        <AnimatePresence mode="wait">
+    <AuthContext.Provider value={authMethods}>
+      <div className="min-h-screen font-sans flex flex-col">
+        <Header 
+          isDarkMode={isDarkMode} 
+          toggleDarkMode={toggleDarkMode} 
+          isAuthenticated={isAuthenticated} 
+          logout={authMethods.logout}
+        />
+        
+        <main className="container mx-auto px-4 py-6 md:px-6 md:py-8 flex-grow">
           <Routes>
-            <Route path="/" element={<Home />} />
+            {/* Public routes - accessible only when NOT authenticated */}
+            <Route element={<PublicRoute />}>
+              <Route path="/" element={<Home />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+            </Route>
+            
+            {/* Protected routes - require authentication */}
+            <Route element={<ProtectedRoute />}>
+              <Route path="/dashboard" element={<Dashboard />} />
+              {/* Add other protected routes here */}
+            </Route>
+            
+            {/* Catch-all route */}
             <Route path="*" element={<NotFound />} />
           </Routes>
-        </AnimatePresence>
-      </main>
-
-      <footer className="mt-12 py-6 bg-surface-100 dark:bg-surface-800">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="text-center text-surface-500 dark:text-surface-400 text-sm">
-            © {new Date().getFullYear()} PayWave. All rights reserved.
-          </div>
-        </div>
-      </footer>
-
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme={isDarkMode ? "dark" : "light"}
-        className="mt-16 md:mt-0"
-      />
-    </div>
+        </main>
+        
+        <Footer />
+        
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme={isDarkMode ? "dark" : "light"}
+          className="mt-16 md:mt-0"
+        />
+      </div>
+    </AuthContext.Provider>
   );
 }
 
