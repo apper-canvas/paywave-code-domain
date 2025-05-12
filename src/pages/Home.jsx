@@ -109,7 +109,7 @@ const Home = () => {
               }`}
             >
               <Download className={`w-4 h-4 ${currentTab === 'request' ? 'text-primary' : ''}`
-              })}
+              } />
               <span className={currentTab === 'request' ? 'font-medium text-primary' : ''}>Request</span>
             </button>
             <button 
@@ -121,7 +121,7 @@ const Home = () => {
               }`}
             >
               <ScanLine className={`w-4 h-4 ${currentTab === 'scan' ? 'text-primary' : ''}`
-              })}
+              } />
               <span className={currentTab === 'scan' ? 'font-medium text-primary' : ''}>Scan QR</span>
             </button>
             <button 
