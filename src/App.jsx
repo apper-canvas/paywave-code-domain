@@ -42,7 +42,7 @@ function App() {
         <div className="container mx-auto">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-primary to-accent flex items-center justify-center">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-primary via-primary-light to-accent flex items-center justify-center">
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
@@ -51,7 +51,7 @@ function App() {
                   <Wallet className="w-4 h-4 text-white" />
                 </motion.div>
               </div>
-              <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              <h1 className="text-xl font-bold bg-gradient-to-r from-primary via-primary-light to-accent bg-clip-text text-transparent">
                 PayWave
               </h1>
             </div>
