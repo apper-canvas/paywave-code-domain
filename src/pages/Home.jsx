@@ -2,6 +2,7 @@ import { useState, React } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'react-toastify';
 import MainFeature from '../components/MainFeature';
+import getIcon from '../utils/iconUtils';
 import { CreditCard, SendHorizonal, Wallet, Plus, ArrowDownToLine, Download, ScanLine, ChevronRight } from 'lucide-react';
 
 const Home = () => {
