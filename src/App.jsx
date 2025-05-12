@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { useDispatch, useSelector } from 'react-redux';
 import { setUser, clearUser } from './store/userSlice';
 import getIcon from './utils/iconUtils';
+import axios from 'axios';
 
 // Components
 import ProtectedRoute from './components/ProtectedRoute';
@@ -27,6 +28,9 @@ function App() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [isInitialized, setIsInitialized] = useState(false);
+  const [todoData, setTodoData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [isDarkMode, setIsDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
       return localStorage.getItem('theme') === 'dark' || 
@@ -48,6 +52,25 @@ function App() {
       localStorage.setItem('theme', 'light');
     }
   }, [isDarkMode]);
+
+  // Fetch todo data using axios
+  useEffect(() => {
+    const fetchTodo = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.get('https://jsonplaceholder.typicode.com/todos/1');
+        setTodoData(response.data);
+        setError(null);
+      } catch (err) {
+        setError('Error fetching data: ' + err.message);
+        toast.error('Failed to fetch todo data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTodo();
+  }, []);
 
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
@@ -110,6 +133,21 @@ function App() {
         />
         
         <main className="container mx-auto px-4 py-6 md:px-6 md:py-8 flex-grow">
+          {/* Display fetched todo data */}
+          <div className="mb-6 p-4 bg-white dark:bg-surface-800 rounded-xl shadow-card">
+            <h2 className="text-xl font-semibold mb-3">Todo from JSONPlaceholder:</h2>
+            {loading && <p className="text-surface-600 dark:text-surface-400">Loading todo data...</p>}
+            {error && <p className="text-red-600 dark:text-red-400">{error}</p>}
+            {todoData && !loading && !error && (
+              <div className="space-y-2">
+                <p><strong>ID:</strong> {todoData.id}</p>
+                <p><strong>Title:</strong> {todoData.title}</p>
+                <p><strong>Completed:</strong> {todoData.completed ? 'Yes' : 'No'}</p>
+                <p><strong>User ID:</strong> {todoData.userId}</p>
+              </div>
+            )}
+          </div>
+
           <Routes>
             {/* Public routes - accessible only when NOT authenticated */}
             <Route element={<PublicRoute />}>
