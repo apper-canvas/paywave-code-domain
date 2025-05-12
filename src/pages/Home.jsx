@@ -2,8 +2,9 @@ import { useState, React } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'react-toastify';
 import MainFeature from '../components/MainFeature';
+import BankBalanceCard from '../components/BankBalanceCard';
 import getIcon from '../utils/iconUtils';
-import { CreditCard, SendHorizonal, Wallet, Plus, ArrowDownToLine, Download, ScanLine, ChevronRight } from 'lucide-react';
+import { CreditCard, SendHorizonal, Wallet, Plus, ArrowDownToLine, Download, ScanLine, ChevronRight, Building, RefreshCw } from 'lucide-react';
 
 const Home = () => {
   const [currentTab, setCurrentTab] = useState('send');
@@ -11,6 +12,9 @@ const Home = () => {
   const Send = getIcon('SendHorizonal');
   const Wallet = getIcon('Wallet');
   const History = getIcon('ClockRewind');
+  const Building = getIcon('Building');
+  
+  const [showBankBalance, setShowBankBalance] = useState(false);
   
   // Recent transactions data
   const [recentTransactions] = useState([
@@ -23,6 +27,38 @@ const Home = () => {
   // Wallet balance
   const [balance] = useState(1256.78);
   
+  // Bank account data
+  const [bankAccounts] = useState([
+    { 
+      id: 1, 
+      bankName: 'First National Bank', 
+      accountType: 'Checking', 
+      accountNumber: '****4567',
+      balance: 3245.67,
+      logo: 'https://source.unsplash.com/100x100/?bank,logo,1',
+      color: 'from-blue-500 to-indigo-500'
+    },
+    { 
+      id: 2, 
+      bankName: 'City Credit Union', 
+      accountType: 'Savings', 
+      accountNumber: '****1234',
+      balance: 12750.42,
+      logo: 'https://source.unsplash.com/100x100/?bank,logo,2',
+      color: 'from-emerald-500 to-green-500'
+    },
+    { 
+      id: 3, 
+      bankName: 'Global Investment Bank', 
+      accountType: 'Investment', 
+      accountNumber: '****7890',
+      balance: 45689.23,
+      logo: 'https://source.unsplash.com/100x100/?bank,logo,3',
+      color: 'from-purple-500 to-violet-500'
+    }
+  ]);
+  
+  const [isCheckingBalance, setIsCheckingBalance] = useState(false);
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: { 
@@ -40,6 +76,17 @@ const Home = () => {
       opacity: 1,
       transition: { type: 'spring', stiffness: 100 }
     }
+  };
+
+  const handleCheckBalance = () => {
+    setIsCheckingBalance(true);
+    setShowBankBalance(true);
+    
+    // Simulate API call delay
+    setTimeout(() => {
+      setIsCheckingBalance(false);
+      toast.success("Bank balances updated successfully!");
+    }, 1500);
   };
 
   return (
@@ -82,6 +129,22 @@ const Home = () => {
           </div>
         </div>
       </motion.div>
+      
+      {/* Bank Balance Section */}
+      {showBankBalance && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+        >
+          <BankBalanceCard 
+            bankAccounts={bankAccounts} 
+            isLoading={isCheckingBalance} 
+            onClose={() => setShowBankBalance(false)}
+          />
+        </motion.div>
+      )}
       
       {/* Main Feature Section */}
       <motion.div 
@@ -206,14 +269,15 @@ const Home = () => {
           {[
             { icon: 'Receipt', label: 'Bills', color: 'from-purple-500 to-pink-500' },
             { icon: 'ShoppingBag', label: 'Shopping', color: 'from-amber-500 to-orange-500' },
-            { icon: 'Ticket', label: 'Tickets', color: 'from-emerald-500 to-teal-500' },
+            { icon: 'Building', label: 'Bank Balance', color: 'from-emerald-500 to-teal-500', 
+              onClick: handleCheckBalance },
             { icon: 'Bus', label: 'Transport', color: 'from-sky-500 to-blue-500' }
           ].map((item, index) => {
             const ItemIcon = getIcon(item.icon);
             return (
               <div 
                 key={index}
-                onClick={() => toast.info(`${item.label} feature coming soon!`)}
+                onClick={item.onClick || (() => toast.info(`${item.label} feature coming soon!`))}
                 className="card flex flex-col items-center justify-center py-6 cursor-pointer hover:shadow-lg transition-all hover:-translate-y-1"
               >
                 <div className={`w-12 h-12 rounded-full bg-gradient-to-r ${item.color} flex items-center justify-center mb-3`}>
