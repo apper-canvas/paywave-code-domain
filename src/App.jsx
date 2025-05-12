@@ -34,6 +34,7 @@ function App() {
 
   const Moon = getIcon('Moon');
   const Sun = getIcon('Sun');
+  const Wallet = getIcon('Wallet');
 
   return (
     <div className="min-h-screen font-sans">
@@ -47,7 +48,7 @@ function App() {
                   animate={{ scale: 1 }}
                   transition={{ type: "spring", stiffness: 260, damping: 20 }}
                 >
-                  {getIcon('Wallet')({ className: "w-4 h-4 text-white" })}
+                  <Wallet className="w-4 h-4 text-white" />
                 </motion.div>
               </div>
               <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
