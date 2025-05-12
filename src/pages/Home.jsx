@@ -1,8 +1,8 @@
 import { useState, React } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'react-toastify';
-import getIcon from '../utils/iconUtils';
 import MainFeature from '../components/MainFeature';
+import { CreditCard, SendHorizonal, Wallet, Plus, ArrowDownToLine, Download, ScanLine, ChevronRight } from 'lucide-react';
 
 const Home = () => {
   const [currentTab, setCurrentTab] = useState('send');
@@ -68,14 +68,14 @@ const Home = () => {
               onClick={() => toast.info("Add money feature coming soon!")}
               className="bg-white/20 hover:bg-white/30 py-2 px-4 rounded-xl transition-colors flex items-center justify-center gap-2 backdrop-blur-sm"
             >
-              {getIcon('Plus')({ className: "w-4 h-4" })}
+              <Plus className="w-4 h-4" />
               <span>Add Money</span>
             </button>
             <button 
               onClick={() => toast.info("Withdraw feature coming soon!")}
               className="bg-white/20 hover:bg-white/30 py-2 px-4 rounded-xl transition-colors flex items-center justify-center gap-2 backdrop-blur-sm"
             >
-              {getIcon('ArrowDownToLine')({ className: "w-4 h-4" })}
+              <ArrowDownToLine className="w-4 h-4" />
               <span>Withdraw</span>
             </button>
           </div>
@@ -108,8 +108,7 @@ const Home = () => {
                   : 'hover:bg-white/50 dark:hover:bg-surface-600'
               }`}
             >
-              {getIcon('Download')({ 
-                className: `w-4 h-4 ${currentTab === 'request' ? 'text-primary' : ''}` 
+              <Download className={`w-4 h-4 ${currentTab === 'request' ? 'text-primary' : ''}`
               })}
               <span className={currentTab === 'request' ? 'font-medium text-primary' : ''}>Request</span>
             </button>
@@ -121,8 +120,7 @@ const Home = () => {
                   : 'hover:bg-white/50 dark:hover:bg-surface-600'
               }`}
             >
-              {getIcon('ScanLine')({ 
-                className: `w-4 h-4 ${currentTab === 'scan' ? 'text-primary' : ''}` 
+              <ScanLine className={`w-4 h-4 ${currentTab === 'scan' ? 'text-primary' : ''}`
               })}
               <span className={currentTab === 'scan' ? 'font-medium text-primary' : ''}>Scan QR</span>
             </button>
@@ -155,7 +153,7 @@ const Home = () => {
             className="text-primary hover:text-primary-dark flex items-center gap-1"
           >
             <span>View all</span>
-            {getIcon('ChevronRight')({ className: "w-4 h-4" })}
+            <ChevronRight className="w-4 h-4" />
           </button>
         </div>
         
