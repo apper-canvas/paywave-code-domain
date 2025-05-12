@@ -7,13 +7,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setUser, clearUser } from './store/userSlice';
 import getIcon from './utils/iconUtils';
 import axios from 'axios';
-import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
-import timezone from 'dayjs/plugin/timezone';
-
-// Initialize dayjs plugins
-dayjs.extend(utc);
-dayjs.extend(timezone);
+import moment from 'moment';
+import 'moment-timezone';
 
 // Components
 import ProtectedRoute from './components/ProtectedRoute';
@@ -39,8 +34,8 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [currentTime, setCurrentTime] = useState({
-    utc: dayjs().utc().format('YYYY-MM-DD HH:mm:ss'),
-    local: dayjs().format('YYYY-MM-DD HH:mm:ss')
+    utc: moment().utc().format('YYYY-MM-DD HH:mm:ss'),
+    local: moment().format('YYYY-MM-DD HH:mm:ss')
   });
   const [isDarkMode, setIsDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -58,8 +53,8 @@ function App() {
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime({
-        utc: dayjs().utc().format('YYYY-MM-DD HH:mm:ss'),
-        local: dayjs().format('YYYY-MM-DD HH:mm:ss')
+        utc: moment().utc().format('YYYY-MM-DD HH:mm:ss'),
+        local: moment().format('YYYY-MM-DD HH:mm:ss')
       });
     }, 1000);
     
@@ -157,7 +152,7 @@ function App() {
         />
         
         <main className="container mx-auto px-4 py-6 md:px-6 md:py-8 flex-grow">
-          {/* Display current time with dayjs */}
+          {/* Display current time with moment */}
           <div className="mb-6 p-4 bg-white dark:bg-surface-800 rounded-xl shadow-card">
             <h2 className="text-xl font-semibold mb-3">Current Time:</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -167,7 +162,7 @@ function App() {
               </div>
               <div className="p-3 bg-surface-100 dark:bg-surface-700 rounded-lg">
                 <p className="text-sm text-surface-600 dark:text-surface-400 mb-1">
-                  Local Time ({dayjs.tz.guess()}):
+                  Local Time ({moment.tz.guess()}):
                 </p>
                 <p className="text-xl font-mono">{currentTime.local}</p>
               </div>
