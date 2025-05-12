@@ -58,7 +58,7 @@ function App() {
     const fetchTodo = async () => {
       setLoading(true);
       try {
-        const response = await axios.get('https://jsonplaceholder.typicode.com/todos/1');
+        const response = await axios.get('https://jsonplaceholder.typicode.com/todos/2');
         setTodoData(response.data);
         setError(null);
       } catch (err) {
