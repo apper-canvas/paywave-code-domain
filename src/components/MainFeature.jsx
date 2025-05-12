@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
 import getIcon from '../utils/iconUtils';
+import { calculateRewards, REWARD_RATE } from '../utils/rewardUtils';
 
 const MainFeature = ({ activeTab }) => {
   // Common icons
@@ -16,6 +17,7 @@ const MainFeature = ({ activeTab }) => {
   const CameraIcon = getIcon('Camera');
   const CreditCardIcon = getIcon('CreditCard');
   const PlusIcon = getIcon('Plus');
+  const GiftIcon = getIcon('Gift');
   const ChevronRightIcon = getIcon('ChevronRight');
   
   // States for Send Money tab
@@ -23,6 +25,9 @@ const MainFeature = ({ activeTab }) => {
   const [amount, setAmount] = useState('');
   const [note, setNote] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  // Add rewards state
+  const [currentReward, setCurrentReward] = useState(0);
+  const [totalRewards, setTotalRewards] = useState(1250); // Starting with some existing rewards
   const [showConfirmation, setShowConfirmation] = useState(false);
   
   // Recent contacts data
@@ -48,6 +53,13 @@ const MainFeature = ({ activeTab }) => {
     contact.phone.includes(searchTerm)
   );
   
+  // Update rewards calculation when amount changes
+  useEffect(() => {
+    if (amount) {
+      setCurrentReward(calculateRewards(amount));
+    }
+  }, [amount]);
+  
   // Handle send money form submission
   const handleSendMoney = (e) => {
     e.preventDefault();
@@ -71,7 +83,11 @@ const MainFeature = ({ activeTab }) => {
   const handleConfirmSend = () => {
     const selectedContact = contacts.find(c => c.id === parseInt(recipient));
     
-    toast.success(`$${parseFloat(amount).toFixed(2)} sent to ${selectedContact?.name}!`);
+    // Update total rewards
+    setTotalRewards(prevTotal => prevTotal + currentReward);
+    
+    // Show success toast with rewards information
+    toast.success(`$${parseFloat(amount).toFixed(2)} sent to ${selectedContact?.name}! You earned ${currentReward} reward points!`);
     
     // Reset form
     setRecipient('');
@@ -280,12 +296,32 @@ const MainFeature = ({ activeTab }) => {
                     <span className="text-surface-500 dark:text-surface-400">Amount</span>
                     <span className="font-medium">${parseFloat(amount).toFixed(2)}</span>
                   </div>
+                  <div className="flex justify-between mb-2 text-accent">
+                    <div className="flex items-center">
+                      <GiftIcon className="w-4 h-4 mr-1" />
+                      <span>Rewards</span>
+                    </div>
+                    <span className="font-medium">+{currentReward} points</span>
+                  </div>
+                  <div className="flex justify-between border-t border-surface-200 dark:border-surface-700 pt-2 mt-2">
+                    <span className="font-medium">${parseFloat(amount).toFixed(2)}</span>
+                  </div>
                   {note && (
                     <div className="flex justify-between">
                       <span className="text-surface-500 dark:text-surface-400">Note</span>
                       <span className="font-medium">{note}</span>
                     </div>
                   )}
+                </div>
+                
+                <div className="bg-primary/5 rounded-lg p-3 mb-6">
+                  <div className="flex items-center text-primary mb-1">
+                    <GiftIcon className="w-4 h-4 mr-2" />
+                    <span className="font-medium">Rewards Information</span>
+                  </div>
+                  <p className="text-sm text-surface-600 dark:text-surface-300">
+                    You earn {REWARD_RATE * 100}% in rewards points on every transfer. Your current total is {totalRewards + currentReward} points.
+                  </p>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-4">
